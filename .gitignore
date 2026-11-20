@@ -1,0 +1,29 @@
+# Unreal-generated files in the project and plugins
+Binaries/
+DerivedDataCache/
+Intermediate/
+Saved/
+
+# Local third-party plugins installed separately
+/Plugins/ThirdParty/
+
+# IDE metadata and generated project files
+.vs/
+.idea/
+*.sln
+*.slnx
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.suo
+*.user
+*.VC.db
+*.VC.opendb
+*.xcodeproj/
+*.xcworkspace/
+
+# OS metadata and local logs
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.log
