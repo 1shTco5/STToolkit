@@ -1,15 +1,15 @@
-﻿#include "CustomAssetTabFactory.h"
+﻿#include "CustomAssetPropertyTabFactory.h"
 #include "CustomAssetEditorApp.h"
 #include "CustomAsset.h"
 #include "IDetailsView.h"
 #include "PropertyEditorModule.h"
 
-CustomAssetTabFactory::CustomAssetTabFactory(TSharedPtr<class CustomAssetEditorApp> App) : FWorkflowTabFactory(
-    FName("CustomAssetTab"), App) {
+CustomAssetPropertyTabFactory::CustomAssetPropertyTabFactory(TSharedPtr<class CustomAssetEditorApp> App) :
+    FWorkflowTabFactory(FName("CustomAssetPropertyTab"), App) {
     m_App = App;
 }
 
-TSharedRef<SWidget> CustomAssetTabFactory::CreateTabBody(const FWorkflowTabSpawnInfo& Info) const {
+TSharedRef<SWidget> CustomAssetPropertyTabFactory::CreateTabBody(const FWorkflowTabSpawnInfo& Info) const {
     TSharedPtr<CustomAssetEditorApp> App = m_App.Pin();
     FPropertyEditorModule& PropertyEditorModule = FModuleManager::LoadModuleChecked<FPropertyEditorModule>(
         TEXT("PropertyEditor"));
@@ -39,6 +39,6 @@ TSharedRef<SWidget> CustomAssetTabFactory::CreateTabBody(const FWorkflowTabSpawn
         ];
 }
 
-FText CustomAssetTabFactory::GetTabToolTipText(const FWorkflowTabSpawnInfo& Info) const {
-    return FText::FromString(TEXT("A view for doing something"));
+FText CustomAssetPropertyTabFactory::GetTabToolTipText(const FWorkflowTabSpawnInfo& Info) const {
+    return FText::FromString(TEXT("A property view for current asset"));
 }

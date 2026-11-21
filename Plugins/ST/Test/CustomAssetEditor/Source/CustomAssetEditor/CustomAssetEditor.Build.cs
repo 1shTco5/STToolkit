@@ -43,7 +43,10 @@ public class CustomAssetEditor : ModuleRules
 				"CustomAssetEditorRuntime",
 				"AssetTools",
 				"UnrealEd",
-				"PropertyEditor"
+				"PropertyEditor",
+				"Projects",
+				"ToolMenus",
+				"GraphEditor"
 				// ... add private dependencies that you statically link with here ...	
 			}
 		);

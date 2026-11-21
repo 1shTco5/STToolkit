@@ -11,7 +11,7 @@ FText CustomAssetAction::GetName() const {
 }
 
 FColor CustomAssetAction::GetTypeColor() const {
-    return FColor::Cyan;
+    return FColor::Orange;
 }
 
 UClass* CustomAssetAction::GetSupportedClass() const {

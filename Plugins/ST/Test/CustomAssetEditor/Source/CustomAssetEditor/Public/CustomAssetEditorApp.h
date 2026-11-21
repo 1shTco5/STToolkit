@@ -24,11 +24,27 @@ public:
     virtual void OnToolkitHostingFinished(const TSharedRef<class IToolkit>& Toolkit) override {
     }
 
+    virtual void OnClose() override;
+
+
     // ~End FAssetEditorToolKit Interface 
 
+public:
     class UCustomAsset* GetWorkingAsset() const { return m_WorkingAsset; }
-    
+    class UEdGraph* GetWorkingGraph() const { return m_WorkingGraph; }
+
+    void OnGraphChanged(const FEdGraphEditAction& EditAction);
+
+protected:
+    void UpdateWorkingAssetFromGraph();
+    void UpdateEditorGraphFromWorkingAsset();
+
 private:
     UPROPERTY()
     class UCustomAsset* m_WorkingAsset;
+
+    UPROPERTY()
+    class UEdGraph* m_WorkingGraph;
+
+    FDelegateHandle m_GraphChangeListenerHandle;
 };

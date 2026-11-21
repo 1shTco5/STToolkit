@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
+#include "CustomRuntimeGraph.h"
 #include "CustomAsset.generated.h"
 
 UCLASS(BlueprintType)
@@ -16,4 +17,7 @@ public:
     
     UPROPERTY(EditAnywhere)
     bool SomeBool = false;
+    
+    UPROPERTY()
+    UCustomRuntimeGraph* Graph = nullptr;
 };
