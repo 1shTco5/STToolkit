@@ -14,14 +14,20 @@ public class STToolkit : ModuleRules
 			"CoreUObject", 
 			"Engine", 
 			"InputCore",
-			"DialogAssetEditorRuntime"
+			// Test
+			"DialogAssetEditorRuntime",
+			// STToolkit
+			"STGraphEditorRuntime"
 		});
 		
 		if (Target.bBuildEditor)
 		{
 			PublicDependencyModuleNames.AddRange(new string[]
 			{
-				"DialogAssetEditor"
+				// Test
+				"DialogAssetEditor",
+				// STToolkit
+				"STGraphEditor"
 			});
 		}
 
