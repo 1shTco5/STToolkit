@@ -3,11 +3,11 @@
 #include "STGraphNodeInfo.h"
 #include "STDialogueNodeInfo.generated.h"
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct STDIALOGUEEDITORRUNTIME_API FSTDialogueOutputPinPayload {
     GENERATED_BODY()
 
-    UPROPERTY(EditAnywhere, Category = "Dialogue", meta = (MultiLine = true))
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Dialogue", meta = (MultiLine = true))
     FText ResponseText;
 };
 
@@ -16,9 +16,9 @@ class STDIALOGUEEDITORRUNTIME_API USTDialogueMiddleNodeInfo : public USTGraphMid
     GENERATED_BODY()
 
 public:
-    UPROPERTY(EditAnywhere, Category = "Dialogue")
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Dialogue")
     FText SpeakerName;
 
-    UPROPERTY(EditAnywhere, Category = "Dialogue", meta = (MultiLine = true))
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Dialogue", meta = (MultiLine = true))
     FText DialogueText;
 };

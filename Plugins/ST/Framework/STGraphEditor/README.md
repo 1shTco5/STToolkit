@@ -29,6 +29,14 @@ STGraphEditor 为对话、连招、任务等业务提供公共图资产基类、
 
 编辑器保存的资产仍包含 `EditorGraph`。目标关闭编辑器专用数据时，`EditorGraph` 和 `GetEditorGraph()` 都不会参与编译。Cook 过滤编辑器专用数据时会剥离该属性。业务资产需通过 Runtime 模块中定义的属性保存游戏所需的数据。
 
+`USTGraphAsset` 将编辑图 getter、字段和编辑器友元放在同一个 `WITH_EDITORONLY_DATA` 块内，块内按需使用 `public` 和 `private`。App 通过友元声明写入生成后的 `RuntimeGraph`。
+
+`USTGraphAsset::GetRuntimeGraph()` 提供运行时数据入口。`FSTRuntimeGraph` 保存全部 ST 节点，各节点包含角色、NodeInfo 和输出引脚的目标节点 ID。入口由业务从节点数组筛选。`FindNode()` 按节点 ID 查询，`FindOutputPinInfo()` 按输出的 `PinId` 找到对应的 NodeInfo 条目和 Payload。
+
+运行时节点、节点角色和输出记录可在蓝图中读取。业务模块可按值返回 `FSTRuntimeNode`，蓝图拆分该结构后即可读取角色、NodeInfo 和输出 Pin ID。蓝图反射已通过 UE 5.8 编辑器构建，实际蓝图连线待验证。
+
+在 ST 图编辑窗口执行 **Save** 时，App 从 `EditorGraph` 生成 `RuntimeGraph`，把 NodeInfo 复制到资产，保留输出的所有目标节点 ID。转换失败会显示原因并保留上次成功生成的数据。已有资产需要在 ST 图编辑窗口保存一次以填充运行时图。Save As、内容浏览器保存、Save All 和 Cook 暂未接入自动转换，Cook 使用资产中已保存的运行时图。
+
 ## 源码目录
 
 Editor 模块按职责组织。资产定义和 Factory 在 `Public/Asset/` 与 `Private/Asset/`，Schema、节点类型与创建动作在 `Public/Graph/` 与 `Private/Graph/`，编辑窗口、模式和页签在 `Private/Editor/`。示例位于 `Private/_Examples/`。
@@ -76,6 +84,8 @@ Editor 模块从插件的 `Resources/Icon/FlowGraph.png` 注册 `ClassIcon.STGra
 | 3. 完善基本操作 | 已实现节点右键删除、Middle 动态输出和单选节点属性联动 | 验证删除指定输出后其余连线保留，以及零输出和 Description 在保存重开后保留 |
 
 ## 验证记录
+
+运行时图查询和 ST 编辑窗口的保存转换已通过 UE 5.8 编辑器及游戏目标构建和格式检查。实际资产保存重开、Payload 保留和打包后读取待验收。
 
 每条输出的 Payload 和示例 Note 已通过 UE 5.8 编辑器构建和格式检查。Details 展开编辑以及保存重开待交互验收。
 

@@ -1,16 +1,11 @@
 #pragma once
 
 #include "EdGraph/EdGraphSchema.h"
+#include "STGraphRuntimeData.h"
 #include "Templates/SubclassOf.h"
 #include "STGraphSchema.generated.h"
 
 class USTGraphNodeBase;
-
-enum class ESTGraphNodeRole : uint8 {
-    Start,
-    Middle,
-    End,
-};
 
 struct FSTGraphNodeMenuEntry {
     TSubclassOf<USTGraphNodeBase> NodeClass;

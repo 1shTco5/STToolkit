@@ -27,6 +27,7 @@ public class STDialogueEditorRuntime : ModuleRules
 			{
 				"Core",
 				"STGraphEditorRuntime",
+				"UMG",
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);

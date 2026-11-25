@@ -15,8 +15,10 @@ public:
     virtual FLinearColor GetNodeTitleColor() const override { return FLinearColor::Red; }
     //~End UEdGraphNode Interface
 
-protected:
     //~Begin USTGraphNodeBase Interface
+    virtual ESTGraphNodeRole GetNodeRole() const override { return ESTGraphNodeRole::Start; }
+
+protected:
     virtual TSubclassOf<USTGraphNodeInfoBase> GetNodeInfoClass() const override;
     virtual FText GetDefaultNodeTitle(ENodeTitleType::Type TitleType) const override {
         return FText::FromString(TEXT("Start"));
@@ -35,6 +37,7 @@ public:
     //~End UEdGraphNode Interface
 
     //~Begin USTGraphNodeBase Interface
+    virtual ESTGraphNodeRole GetNodeRole() const override { return ESTGraphNodeRole::Middle; }
     virtual void PostLoad() override;
     virtual void OnNodeInfoChanged() override;
     virtual void GetNodeContextMenuActions(UToolMenu* Menu, UGraphNodeContextMenuContext* Context) const override;
@@ -65,8 +68,10 @@ public:
     virtual FLinearColor GetNodeTitleColor() const override { return FLinearColor::Blue; }
     //~End UEdGraphNode Interface
 
-protected:
     //~Begin USTGraphNodeBase Interface
+    virtual ESTGraphNodeRole GetNodeRole() const override { return ESTGraphNodeRole::End; }
+
+protected:
     virtual TSubclassOf<USTGraphNodeInfoBase> GetNodeInfoClass() const override;
     virtual FText GetDefaultNodeTitle(ENodeTitleType::Type TitleType) const override {
         return FText::FromString(TEXT("End"));
