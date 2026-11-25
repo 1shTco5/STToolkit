@@ -6,4 +6,8 @@
 TSubclassOf<USTGraphNodeInfoBase> USTDialogueMiddleNode::GetNodeInfoClass() const {
     return USTDialogueMiddleNodeInfo::StaticClass();
 }
+
+const UScriptStruct* USTDialogueMiddleNode::GetOutputPayloadStruct() const {
+    return FSTDialogueOutputPinPayload::StaticStruct();
+}
 #pragma endregion

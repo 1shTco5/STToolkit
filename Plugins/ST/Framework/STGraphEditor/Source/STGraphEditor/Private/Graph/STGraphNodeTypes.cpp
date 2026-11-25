@@ -81,6 +81,7 @@ void USTGraphMiddleNode::SyncOutputInfoFromPins() {
         return;
     }
 
+    const UScriptStruct* PayloadStruct = GetOutputPayloadStruct();
     TArray<FSTGraphOutputPinInfo> Outputs;
     for (const UEdGraphPin* Pin : Pins) {
         if (!IsFlowOutputPin(Pin)) {
@@ -95,6 +96,11 @@ void USTGraphMiddleNode::SyncOutputInfoFromPins() {
             FSTGraphOutputPinInfo& Output = Outputs.AddDefaulted_GetRef();
             Output.PinId = Pin->PinId;
             Output.DisplayName = Pin->GetDisplayName();
+        }
+
+        FInstancedStruct& Payload = Outputs.Last().Payload;
+        if (PayloadStruct && !Payload.IsValid()) {
+            Payload.InitializeAs(PayloadStruct);
         }
     }
     Info->Outputs = MoveTemp(Outputs);

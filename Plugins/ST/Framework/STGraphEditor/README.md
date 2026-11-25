@@ -55,6 +55,10 @@ Start 继承红色，Middle 继承橙色，End 继承蓝色。节点允许删除
 
 选中 Middle 后，可在 Details 的 **Pins → Outputs** 中展开现有输出并编辑 **Display Name**。清空后恢复默认名称。列表只允许编辑已有条目的属性，输出的增删仍通过右键菜单完成。每项通过原引脚的 `PinId` 匹配，改名更新 `PinFriendlyName`，无需重建引脚。旧资产加载时从实际输出补建缺失条目，已经删到零个输出的节点保留空列表。
 
+每条输出可选用 `FInstancedStruct Payload` 保存自己的扩展字段。业务 Middle 节点可通过 `GetOutputPayloadStruct()` 指定类型，默认留空。同步时按 `PinId` 保留已有数据，只初始化空的 Payload。Payload 的类型由节点代码决定。Details 隐藏类型选择器，展开示例 Middle 的 **Pins → Outputs** 中任一输出可直接编辑对应的 **Note**。
+
+**重置说明**：Details 沿用 UE 的原生重置。重置 **Index** 会重置整条输出记录，可能清空 Payload。只想恢复某个字段时，请使用该字段旁的重置按钮，例如 **Note**。
+
 每个节点持有自己的 `NodeInfo`，新节点在放置时初始化，旧节点加载时补建缺失的实例。节点保存时会带上该实例。挂在编辑图节点下的这份实例随编辑图在 Cook 时过滤。运行时需要的数据由业务 Runtime 资产持有。
 
 ## 资产图标
@@ -72,6 +76,8 @@ Editor 模块从插件的 `Resources/Icon/FlowGraph.png` 注册 `ClassIcon.STGra
 | 3. 完善基本操作 | 已实现节点右键删除、Middle 动态输出和单选节点属性联动 | 验证删除指定输出后其余连线保留，以及零输出和 Description 在保存重开后保留 |
 
 ## 验证记录
+
+每条输出的 Payload 和示例 Note 已通过 UE 5.8 编辑器构建和格式检查。Details 展开编辑以及保存重开待交互验收。
 
 公共节点创建菜单和 Example 注册接口已通过 UE 5.8 编辑器构建及格式检查。空白右键、双向拖线筛选和创建后自动连线待编辑器内验证。
 

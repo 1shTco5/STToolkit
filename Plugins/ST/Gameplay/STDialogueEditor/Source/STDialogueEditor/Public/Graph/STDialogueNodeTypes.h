@@ -15,6 +15,7 @@ class USTDialogueMiddleNode : public USTGraphMiddleNode {
 protected:
     //~Begin USTGraphMiddleNode Interface
     virtual TSubclassOf<USTGraphNodeInfoBase> GetNodeInfoClass() const override;
+    virtual const UScriptStruct* GetOutputPayloadStruct() const override;
     //~End USTGraphMiddleNode Interface
 };
 

@@ -2,6 +2,7 @@
 
 #include "UObject/Object.h"
 #include "Misc/Guid.h"
+#include "StructUtils/InstancedStruct.h"
 #include "STGraphNodeInfo.generated.h"
 
 USTRUCT()
@@ -13,6 +14,9 @@ struct STGRAPHEDITORRUNTIME_API FSTGraphOutputPinInfo {
 
     UPROPERTY(EditAnywhere, Category = "Pin")
     FText DisplayName;
+
+    UPROPERTY(EditAnywhere, Category = "Pin", meta = (StructTypeConst, HideStructType))
+    FInstancedStruct Payload;
 };
 
 UCLASS()
