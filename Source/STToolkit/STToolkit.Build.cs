@@ -17,7 +17,7 @@ public class STToolkit : ModuleRules
 			// Test
 			"DialogAssetEditorRuntime",
 			// STToolkit
-			"STGraphEditorRuntime"
+			"STDialogueEditorRuntime"
 		});
 		
 		if (Target.bBuildEditor)
@@ -27,7 +27,7 @@ public class STToolkit : ModuleRules
 				// Test
 				"DialogAssetEditor",
 				// STToolkit
-				"STGraphEditor"
+				"STDialogueEditor"
 			});
 		}
 
