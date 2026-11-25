@@ -8,6 +8,8 @@ UCLASS()
 class USTDialogueSchema : public USTGraphSchema {
     GENERATED_BODY()
 
-public:
-    
+protected:
+    //~Begin USTGraphSchema Interface
+    virtual void GetNodeMenuEntries(TArray<FSTGraphNodeMenuEntry>& OutEntries) const override;
+    //~End USTGraphSchema Interface
 };

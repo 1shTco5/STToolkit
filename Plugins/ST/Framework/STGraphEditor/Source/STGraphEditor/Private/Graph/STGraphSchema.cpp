@@ -2,6 +2,7 @@
 
 #include "EdGraph/EdGraphNode.h"
 #include "EdGraph/EdGraphPin.h"
+#include "Graph/STGraphAddNodeAction.h"
 
 const FName USTGraphSchema::FlowPinCategory(TEXT("Flow"));
 
@@ -27,5 +28,30 @@ const FPinConnectionResponse USTGraphSchema::CanCreateConnection(const UEdGraphP
     }
 
     return FPinConnectionResponse(CONNECT_RESPONSE_MAKE, FText::GetEmpty());
+}
+
+void USTGraphSchema::GetGraphContextActions(FGraphContextMenuBuilder& ContextMenuBuilder) const {
+    const UEdGraphPin* FromPin = ContextMenuBuilder.FromPin;
+    if (FromPin && (FromPin->bNotConnectable || FromPin->PinType.PinCategory != FlowPinCategory)) {
+        return;
+    }
+
+    TArray<FSTGraphNodeMenuEntry> Entries;
+    GetNodeMenuEntries(Entries);
+
+    const FText Category = FText::FromString(TEXT("Nodes"));
+    for (const FSTGraphNodeMenuEntry& Entry : Entries) {
+        if (!Entry.NodeClass || Entry.NodeClass->HasAnyClassFlags(CLASS_Abstract)) {
+            continue;
+        }
+
+        if (FromPin && ((Entry.Role == ESTGraphNodeRole::Start && FromPin->Direction != EGPD_Input) ||
+                        (Entry.Role == ESTGraphNodeRole::End && FromPin->Direction != EGPD_Output))) {
+            continue;
+        }
+
+        ContextMenuBuilder.AddAction(
+            MakeShared<FSTGraphAddNodeAction>(Entry.NodeClass, Category, Entry.MenuText, Entry.Tooltip));
+    }
 }
 #pragma endregion
