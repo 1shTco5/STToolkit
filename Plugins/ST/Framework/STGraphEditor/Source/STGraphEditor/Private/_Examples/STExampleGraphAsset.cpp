@@ -42,6 +42,10 @@ TSubclassOf<USTGraphNodeInfoBase> USTExampleGraphNode::GetNodeInfoClass() const 
     return USTExampleMiddleNodeInfo::StaticClass();
 }
 
+const UScriptStruct* USTExampleGraphNode::GetOutputPayloadStruct() const {
+    return FSTExampleOutputPinPayload::StaticStruct();
+}
+
 #pragma endregion
 
 #pragma region USTGraphSchema Interface

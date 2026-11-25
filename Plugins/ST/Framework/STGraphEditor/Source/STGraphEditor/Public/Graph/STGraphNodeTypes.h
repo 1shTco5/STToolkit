@@ -44,6 +44,10 @@ public:
     }
     //~End USTGraphNodeBase Interface
 
+protected:
+    // Returns the payload type for new or uninitialized outputs, including during PostLoad.
+    virtual const UScriptStruct* GetOutputPayloadStruct() const { return nullptr; }
+
 private:
     void SyncOutputInfoFromPins();
     void ApplyOutputDisplayNames();

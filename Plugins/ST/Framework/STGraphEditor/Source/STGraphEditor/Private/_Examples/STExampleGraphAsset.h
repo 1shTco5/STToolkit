@@ -39,6 +39,14 @@ class USTExampleStartNode : public USTGraphStartNode {
     GENERATED_BODY()
 };
 
+USTRUCT()
+struct FSTExampleOutputPinPayload {
+    GENERATED_BODY()
+
+    UPROPERTY(EditAnywhere, Category = "Pin")
+    FString Note;
+};
+
 UCLASS()
 class USTExampleMiddleNodeInfo : public USTGraphMiddleNodeInfo {
     GENERATED_BODY()
@@ -58,6 +66,7 @@ public:
 
 protected:
     virtual TSubclassOf<USTGraphNodeInfoBase> GetNodeInfoClass() const override;
+    virtual const UScriptStruct* GetOutputPayloadStruct() const override;
     //~End USTGraphMiddleNode Interface
 
 private:
