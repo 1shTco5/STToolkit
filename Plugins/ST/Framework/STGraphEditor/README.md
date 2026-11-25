@@ -19,7 +19,7 @@ STGraphEditor 为对话、连招、任务等业务提供公共图资产基类、
 | STGraphEditor（Editor） | `FSTGraphPrimaryTabFactory` | 创建 Primary Tab 的 `SGraphEditor`，显示当前资产持有的编辑图。 |
 | STGraphEditor（Editor） | `FSTGraphDetailsTabFactory` | 创建右侧的原生属性面板，按资产打开方式限制编辑，并将面板交给 App 更新。 |
 | STGraphEditor（Editor） | `USTGraphNodeBase`、`FSTGraphAddNodeAction` | 节点基类提供右键删除。公共动作接收具体节点类，在点击位置创建节点并标记资产待保存。 |
-| STGraphEditor（Editor） | `USTGraphSchema` | 提供白色的 `Flow` 引脚及基础连线规则。具体 Schema 决定右键创建菜单。 |
+| STGraphEditor（Editor） | `USTGraphSchema` | 提供白色的 `Flow` 引脚、基础连线规则和统一的节点创建菜单。 |
 | STGraphEditor（Editor） | `USTGraphStartNode`、`USTGraphMiddleNode`、`USTGraphEndNode` | 提供红、橙、蓝三种默认标题栏颜色、默认名称和默认 `Flow` 引脚。Middle 支持动态输出。 |
 | 业务 Runtime 模块 | 具体资产，例如 `USTDialogueAsset` | 继承 `USTGraphAsset`，保存游戏运行时需要的业务数据。 |
 | 业务 Editor 模块 | 具体 Factory、Asset Definition | Factory 指定具体资产类型和 Schema，提供业务创建菜单项；Asset Definition 将双击的资产交给公共 Toolkit。 |
@@ -47,7 +47,7 @@ Editor 模块按职责组织。资产定义和 Factory 在 `Public/Asset/` 与 `
 
 Start 继承红色，Middle 继承橙色，End 继承蓝色。节点允许删除时，右键节点主体可选择 **Delete Node**，断开相关连线并移除节点。`Config/DefaultSTGraphEditor.ini` 将旧的 `STGraphNode` 类引用重定向到 `STGraphNodeBase`。
 
-从 `Out` 拖到空白处可创建 Middle 或 End，从 `In` 拖出可创建 Start 或 Middle。新增节点通过 `USTGraphNodeBase::AutowireNewNode()` 找到反向的 `Flow` 引脚，再由当前 Schema 校验并建立连接。
+业务 Schema 重写 `GetNodeMenuEntries()`，注册具体节点类、Start/Middle/End 角色和菜单名称，也可以提供提示文字。同一角色可以注册多个节点。基类将有效条目放到 **Nodes** 分类并跳过空类和抽象类。空白处右键显示所有有效条目，从 `Out` 拖到空白处显示 Middle 或 End，从 `In` 拖出显示 Start 或 Middle。新增节点通过 `USTGraphNodeBase::AutowireNewNode()` 找到反向的 `Flow` 引脚，再由当前 Schema 校验并建立连接。
 
 单选 ST 节点时，Details 直接显示该节点的 `NodeInfo`。取消选择、多选或删除当前节点时，属性列表会清空。重新打开 Details 页签会恢复当前选中节点的属性。提交属性修改后，画布刷新当前节点。
 
@@ -72,6 +72,8 @@ Editor 模块从插件的 `Resources/Icon/FlowGraph.png` 注册 `ClassIcon.STGra
 | 3. 完善基本操作 | 已实现节点右键删除、Middle 动态输出和单选节点属性联动 | 验证删除指定输出后其余连线保留，以及零输出和 Description 在保存重开后保留 |
 
 ## 验证记录
+
+公共节点创建菜单和 Example 注册接口已通过 UE 5.8 编辑器构建及格式检查。空白右键、双向拖线筛选和创建后自动连线待编辑器内验证。
 
 Middle 加载时通过内部方法补齐输出信息并应用显示名，Details 提交属性时才触发 `OnNodeInfoChanged()`。公共新增节点动作会拒绝只读图。上述改动及 Primary Tab 取图调整已通过 UE 5.8 编辑器构建和格式检查，本轮交互验收已由用户确认通过。
 

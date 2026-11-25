@@ -1,8 +1,5 @@
 #include "STExampleGraphAsset.h"
 
-#include "EdGraph/EdGraphPin.h"
-#include "Graph/STGraphAddNodeAction.h"
-
 #pragma region UAssetDefinition Interface
 FText UAssetDefinition_STExampleGraphAsset::GetAssetDisplayName() const {
     return FText::FromString(TEXT("ST Example Graph"));
@@ -47,27 +44,15 @@ TSubclassOf<USTGraphNodeInfoBase> USTExampleGraphNode::GetNodeInfoClass() const 
 
 #pragma endregion
 
-#pragma region UEdGraphSchema Interface
-void USTExampleGraphSchema::GetGraphContextActions(FGraphContextMenuBuilder& ContextMenuBuilder) const {
-    const UEdGraphPin* FromPin = ContextMenuBuilder.FromPin;
-    if (FromPin && (FromPin->bNotConnectable || FromPin->PinType.PinCategory != FlowPinCategory)) {
-        return;
-    }
-
-    const FText Category = FText::FromString(TEXT("Nodes"));
-    if (!FromPin || FromPin->Direction == EGPD_Input) {
-        ContextMenuBuilder.AddAction(MakeShared<FSTGraphAddNodeAction>(
-            USTExampleStartNode::StaticClass(), Category, FText::FromString(TEXT("Add Start Node")),
-            FText::FromString(TEXT("Create a flow entry node"))));
-    }
-    ContextMenuBuilder.AddAction(MakeShared<FSTGraphAddNodeAction>(
-        USTExampleGraphNode::StaticClass(), Category, FText::FromString(TEXT("Add Middle Node")),
-        FText::FromString(TEXT("Create a node with dynamic flow outputs"))));
-    if (!FromPin || FromPin->Direction == EGPD_Output) {
-        ContextMenuBuilder.AddAction(MakeShared<FSTGraphAddNodeAction>(
-            USTExampleEndNode::StaticClass(), Category, FText::FromString(TEXT("Add End Node")),
-            FText::FromString(TEXT("Create a flow end node"))));
-    }
+#pragma region USTGraphSchema Interface
+void USTExampleGraphSchema::GetNodeMenuEntries(TArray<FSTGraphNodeMenuEntry>& OutEntries) const {
+    OutEntries.Add({USTExampleStartNode::StaticClass(), ESTGraphNodeRole::Start,
+                    FText::FromString(TEXT("Add Start Node")), FText::FromString(TEXT("Create a flow entry node"))});
+    OutEntries.Add({USTExampleGraphNode::StaticClass(), ESTGraphNodeRole::Middle,
+                    FText::FromString(TEXT("Add Middle Node")),
+                    FText::FromString(TEXT("Create a node with dynamic flow outputs"))});
+    OutEntries.Add({USTExampleEndNode::StaticClass(), ESTGraphNodeRole::End, FText::FromString(TEXT("Add End Node")),
+                    FText::FromString(TEXT("Create a flow end node"))});
 }
 
 #pragma endregion

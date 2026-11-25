@@ -74,10 +74,10 @@ UCLASS()
 class USTExampleGraphSchema : public USTGraphSchema {
     GENERATED_BODY()
 
-public:
-    //~Begin UEdGraphSchema Interface
-    virtual void GetGraphContextActions(FGraphContextMenuBuilder& ContextMenuBuilder) const override;
-    //~End UEdGraphSchema Interface
+protected:
+    //~Begin USTGraphSchema Interface
+    virtual void GetNodeMenuEntries(TArray<FSTGraphNodeMenuEntry>& OutEntries) const override;
+    //~End USTGraphSchema Interface
 };
 
 UCLASS()
