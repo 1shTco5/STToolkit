@@ -22,6 +22,7 @@ public:
     //~End FWorkflowCentricApplication Interface
 
     //~Begin FAssetEditorToolkit Interface
+    virtual void SaveAsset_Execute() override;
     virtual FName GetToolkitFName() const override { return TEXT("STGraphEditor"); }
     virtual FText GetBaseToolkitName() const override { return FText::FromString(TEXT("ST Graph Editor")); }
     virtual FString GetWorldCentricTabPrefix() const override { return TEXT("ST Graph"); }
@@ -32,6 +33,7 @@ public:
     //~End FBaseToolkit Interface
 
 private:
+    bool UpdateRuntimeGraphFromEditorGraph(USTGraphAsset& Asset, FText& OutError);
     void OnGraphChanged(const FEdGraphEditAction& Action);
     void OnNodeInfoChanged(const FPropertyChangedEvent& Event);
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "EdGraph/EdGraphNode.h"
+#include "STGraphRuntimeData.h"
 #include "STGraphNodeBase.generated.h"
 
 class USTGraphNodeInfoBase;
@@ -11,6 +12,7 @@ class STGRAPHEDITOR_API USTGraphNodeBase : public UEdGraphNode {
 
 public:
     USTGraphNodeInfoBase* GetNodeInfo() const;
+    virtual ESTGraphNodeRole GetNodeRole() const { return ESTGraphNodeRole::Unknown; }
     virtual void OnNodeInfoChanged() {}
 
     //~Begin UEdGraphNode Interface
