@@ -3,6 +3,7 @@
 #include "EdGraph/EdGraph.h"
 #include "EdGraph/EdGraphPin.h"
 #include "Graph/STGraphNodeBase.h"
+#include "Graph/STGraphSchema.h"
 #include "GraphEditAction.h"
 #include "IDetailsView.h"
 #include "Misc/MessageDialog.h"
@@ -123,6 +124,12 @@ bool FSTGraphEditorApp::UpdateRuntimeGraphFromEditorGraph(USTGraphAsset& Asset, 
             if (!Pin->PinId.IsValid() || PinIds.Contains(Pin->PinId)) {
                 OutError = FText::Format(FText::FromString(TEXT("Output '{0}' has an invalid or duplicate ID.")),
                                          Pin->GetDisplayName());
+                return false;
+            }
+            if (Pin->PinType.PinCategory == USTGraphSchema::FlowPinCategory && Pin->LinkedTo.Num() > 1) {
+                OutError = FText::Format(
+                    FText::FromString(TEXT("Node '{0}' output '{1}' has multiple connections. Keep only one.")),
+                    Node->GetNodeTitle(ENodeTitleType::ListView), Pin->GetDisplayName());
                 return false;
             }
 

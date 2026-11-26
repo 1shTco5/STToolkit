@@ -27,6 +27,13 @@ const FPinConnectionResponse USTGraphSchema::CanCreateConnection(const UEdGraphP
         return FPinConnectionResponse(CONNECT_RESPONSE_DISALLOW, FText::FromString(TEXT("Pins are already linked")));
     }
 
+    const bool bOutputIsA = A->Direction == EGPD_Output;
+    const UEdGraphPin* Output = bOutputIsA ? A : B;
+    if (!Output->LinkedTo.IsEmpty()) {
+        return FPinConnectionResponse(bOutputIsA ? CONNECT_RESPONSE_BREAK_OTHERS_A : CONNECT_RESPONSE_BREAK_OTHERS_B,
+                                      FText::FromString(TEXT("Replace the existing output connection")));
+    }
+
     return FPinConnectionResponse(CONNECT_RESPONSE_MAKE, FText::GetEmpty());
 }
 

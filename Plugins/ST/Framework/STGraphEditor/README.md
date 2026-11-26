@@ -51,6 +51,8 @@ Editor 模块按职责组织。资产定义和 Factory 在 `Public/Asset/` 与 `
 
 示例节点直接继承各自基类的 `AllocateDefaultPins()`。Start 只有 `Out`，Middle 默认有一个固定的 `In` 和一个动态的 `Out`，End 只有 `In`。三种节点都使用 `Flow` 引脚，颜色和连线校验由 `USTGraphSchema` 提供。可以连接 **Start → Middle → End**。此前保存的 `USTExampleGraphNode` 现在显示为 **Middle**，已有的 `Out` 也可以通过菜单删除。
 
+每个 `Flow` 输出最多连接一个输入，输入可以接收多个输出。把已连接的输出接到新输入时，会替换该输出的旧连线。旧资产如果有一出多连，ST 窗口保存时会指出对应节点和输出，保留一条连线后即可保存。
+
 右键 Middle 节点主体，选择 **Add Output Pin** 增加一个独立的 `Flow` 输出。右键某个输出引脚，选择 **Remove Output Pin**，仅移除该引脚及它的连线。Middle 可以保留零个输出，保存后重开时会沿用节点保存的引脚。
 
 Start 继承红色，Middle 继承橙色，End 继承蓝色。节点允许删除时，右键节点主体可选择 **Delete Node**，断开相关连线并移除节点。`Config/DefaultSTGraphEditor.ini` 将旧的 `STGraphNode` 类引用重定向到 `STGraphNodeBase`。
@@ -84,6 +86,8 @@ Editor 模块从插件的 `Resources/Icon/FlowGraph.png` 注册 `ClassIcon.STGra
 | 3. 完善基本操作 | 已实现节点右键删除、Middle 动态输出和单选节点属性联动 | 验证删除指定输出后其余连线保留，以及零输出和 Description 在保存重开后保留 |
 
 ## 验证记录
+
+`Flow` 输出单连线规则和旧资产保存校验已通过 UE 5.8 编辑器构建和格式检查。双向拖线替换及输入端保留其他连线待交互验证。
 
 运行时图查询和 ST 编辑窗口的保存转换已通过 UE 5.8 编辑器及游戏目标构建和格式检查。实际资产保存重开、Payload 保留和打包后读取待验收。
 
