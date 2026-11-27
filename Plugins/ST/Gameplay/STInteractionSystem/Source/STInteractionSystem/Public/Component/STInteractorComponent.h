@@ -60,6 +60,18 @@ private:
     void UpdatePresentation(USTInteractableComponent* Target, ESTCandidateState State);
     void StopPresentation(USTInteractableComponent* Target);
 
+    void TryAdvanceDuringStage();
+    void StartInteractionStage();
+    void FinishInteraction();
+
+    UPROPERTY(Transient)
+    FSTInteractionContext ActiveInteractionContext;
+
+    UPROPERTY(Transient)
+    TArray<TObjectPtr<USTInteractionAction>> ActiveStageActions;
+
+    int32 ActiveStageIndex = INDEX_NONE;
+
     UPROPERTY(Transient)
     TMap<TObjectPtr<USTInteractableComponent>, FSTCandidatePresentation> Presentations;
 

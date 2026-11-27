@@ -1,6 +1,7 @@
 #include "Action/STInteractionAction.h"
 
-void USTInteractionAction::Complete() {}
+void USTInteractionAction::Complete() { bCompleted = true; }
+
 void USTInteractionAction::Fail() {}
 
 void USTInteractionAction::ReceiveInitialize_Implementation(const FSTInteractionContext& Context) {}

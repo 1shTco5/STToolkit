@@ -1,6 +1,6 @@
 # STInteractionSystem
 
-可配置的 Unreal Engine 交互系统。当前支持本地玩家发现目标、筛选候选、选择焦点和运行候选表现 Action。
+可配置的 Unreal Engine 交互系统。当前支持本地候选检测、焦点表现和交互中的成功流程。
 
 ## 接入与职责
 
@@ -48,13 +48,23 @@
 
 Filter、Validator 和 Action 均为抽象、可内联实例化的 UObject。创建 C++ 或蓝图派生类后，可在目标组件的对应数组中选择并配置。Action 提供 ReceiveInitialize、ReceiveStart、ReceiveStop、ReceiveShutdown，以及 Complete、Fail 两个报告入口。
 
+### 交互中
+
+1. 将交互输入接到 `RequestInteractionWithFocus`，或调用 `RequestInteraction(Target)` 指定目标。发起方把 Context 交给目标组件的 `ValidateInteractionRequest`。目标组件调用 `CanInteract` 并按顺序执行自身的 `Validators`，通过后交回允许结果，首个拒绝时交回对应的失败原因。发起方收到允许结果后进入第一阶段。
+2. 在目标组件的 `DuringInteractionStages` 中按顺序配置阶段。同一阶段的动作一起启动，每次执行都复制新的 Action 实例。把需要等待的 Action 勾选 `bWaitForCompletion`，并在它完成时调用 `Complete`。
+3. 所有等待项完成后，下一次 Tick 为当前阶段调用 `ReceiveStop` 和 `ReceiveShutdown`，随后启动下一阶段。最后一阶段结束时调用目标 Actor 的 `OnInteractionCompleted`。未配置阶段时，校验通过后直接触发完成回调。
+
+本版按一次提交、顺利完成的流程使用。请求传输、失败、中断、取消、重复提交和 Post Action 调度留给后续阶段。`OwningClientOnly` 动作在本地主机或单机的本地玩家上执行。
+
+`Action/BP_InteractionAction_MoveToInteractionPoint` 是纯蓝图移动原型。把它加入目标的 `DuringInteractionStages`，并保持 `bWaitForCompletion` 关闭。Action 在 `ReceiveStart` 从交互目标读取 `InteractionPoint` 的世界位置，再用玩家现有的 Controller 调用 `Simple Move to Location`。交互点应放在 NavMesh 覆盖的可达地面上。当前阶段可以在角色实际到达前结束，后续阶段应按这个时序配置。
+
 ## 当前行为与验证范围
 
 `USTInteractionMarkerWidget` 是 C++ 标记基类。选择派生自它的 `MarkerWidgetClass` 后，`CreateInteractionMarker` 会在 `AddToPlayerScreen` 前调用 `SetTargetActor(Context.InteractableActor)`。目标以弱引用保存。`WorldOffset` 仍可通过创建节点传入，默认沿世界 Z 轴向上 60 cm。基类每帧投影目标当前位置，目标失效或投影失败时隐藏标记。
 
 `MarkerText` 是基类的 `FText` 创建引脚，由标记 Action 传入。各 Widget 子类可以自行决定如何使用这段文字和如何设置字形样式。
 
-RequestInteractionWithFocus 将有效焦点传给 RequestInteraction。请求提交、服务端 Validator、During/Post 调度及 Complete/Fail 等待后续实现。ASTInteractableActor 的默认业务资格查询返回 true；未重写的 Filter 和 Validator 均返回拒绝。
+ASTInteractableActor 的默认业务资格查询返回 true，未重写的 Filter 和 Validator 均返回拒绝。
 
 后续随实现同步维护本文件中的接入步骤、字段语义、运行行为与验证记录。
 

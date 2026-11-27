@@ -25,6 +25,9 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Interaction")
     void Fail();
 
+    UFUNCTION(BlueprintPure, Category = "Interaction")
+    bool IsCompleted() const { return bCompleted; }
+
 protected:
     UFUNCTION(BlueprintNativeEvent, Category = "Interaction")
     void ReceiveInitialize(const FSTInteractionContext& Context);
@@ -41,4 +44,7 @@ protected:
     UFUNCTION(BlueprintNativeEvent, Category = "Interaction")
     void ReceiveShutdown(const FSTInteractionContext& Context);
     virtual void ReceiveShutdown_Implementation(const FSTInteractionContext& Context);
+
+private:
+    bool bCompleted = false;
 };

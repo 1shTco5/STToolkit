@@ -24,6 +24,9 @@ public:
     UFUNCTION(BlueprintPure, Category = "Interaction")
     USceneComponent* GetInteractionPoint() const;
 
+    bool CanInteract(const FSTInteractionContext& Context) const;
+    FSTInteractionValidationResult ValidateInteractionRequest(const FSTInteractionContext& Context) const;
+
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Instanced, Category = "Interaction|Pre")
     TArray<TObjectPtr<USTInteractionCandidateFilter>> Filters;
 

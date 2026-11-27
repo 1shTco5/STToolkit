@@ -14,16 +14,14 @@ FSTInteractionContext MakeContext(USTInteractorComponent* Interactor, USTInterac
 }
 
 bool IsCandidateValid(const FSTInteractionContext& Context) {
-    AActor* Actor = Context.InteractableActor;
-    if (Actor->Implements<USTInteractableInterface>() && !ISTInteractableInterface::Execute_CanInteract(Actor, Context))
-        return false;
+    if (!Context.InteractableComponent->CanInteract(Context)) return false;
 
     for (const USTInteractionCandidateFilter* Filter : Context.InteractableComponent->Filters) {
         if (IsValid(Filter) && !Filter->PassesFilter(Context)) return false;
     }
     return true;
 }
-}  // namespace
+} // namespace
 
 USTInteractorComponent::USTInteractorComponent() {
     PrimaryComponentTick.bCanEverTick = true;
@@ -34,6 +32,8 @@ USTInteractorComponent::USTInteractorComponent() {
 void USTInteractorComponent::TickComponent(float DeltaTime, ELevelTick TickType,
                                            FActorComponentTickFunction* TickFunction) {
     Super::TickComponent(DeltaTime, TickType, TickFunction);
+    TryAdvanceDuringStage();
+
     const APawn* Pawn = Cast<APawn>(GetOwner());
     const APlayerController* Controller = Pawn ? Cast<APlayerController>(Pawn->GetController()) : nullptr;
     if (!Controller || !Controller->IsLocalController()) {
@@ -115,9 +115,11 @@ void USTInteractorComponent::RefreshPresentations(
     const auto Targets = RawTargets;
     for (USTInteractableComponent* Target : Targets) {
         if (!IsValid(Target) || !RawTargets.Contains(Target)) continue;
-        const auto State = Target == FocusedTarget         ? ESTCandidateState::Focused
-                           : ValidTargets.Contains(Target) ? ESTCandidateState::Valid
-                                                           : ESTCandidateState::Raw;
+        const auto State = Target == FocusedTarget
+                               ? ESTCandidateState::Focused
+                               : ValidTargets.Contains(Target)
+                               ? ESTCandidateState::Valid
+                               : ESTCandidateState::Raw;
         UpdatePresentation(Target, State);
     }
 }
@@ -131,9 +133,11 @@ void USTInteractorComponent::UpdatePresentation(USTInteractableComponent* Target
     auto& Presentation = Presentations.Add(Target);
     Presentation.State = State;
     Presentation.Context = Context;
-    const auto Templates = State == ESTCandidateState::Focused ? Target->FocusedCandidateActions
-                           : State == ESTCandidateState::Valid ? Target->ValidCandidateActions
-                                                               : Target->RawCandidateActions;
+    const auto Templates = State == ESTCandidateState::Focused
+                               ? Target->FocusedCandidateActions
+                               : State == ESTCandidateState::Valid
+                               ? Target->ValidCandidateActions
+                               : Target->RawCandidateActions;
     for (USTInteractionAction* Template : Templates) {
         if (!IsValid(Template)) continue;
         if (Template->ExecutionPolicy == ESTInteractionExecutionPolicy::ServerOnly && !GetOwner()->HasAuthority())
@@ -165,4 +169,63 @@ void USTInteractorComponent::RequestInteractionWithFocus() {
     if (IsValid(FocusedTarget)) RequestInteraction(FocusedTarget);
 }
 
-void USTInteractorComponent::RequestInteraction(USTInteractableComponent* Target) {}
+void USTInteractorComponent::RequestInteraction(USTInteractableComponent* Target) {
+    const AActor* Owner = GetOwner();
+    if (!IsValid(Owner) || !Owner->HasAuthority() || !IsValid(Target) || !IsValid(Target->GetOwner())) return;
+
+    const FSTInteractionContext Context = MakeContext(this, Target);
+    const FSTInteractionValidationResult Validation = Target->ValidateInteractionRequest(Context);
+    if (!Validation.bAllowed) return;
+
+    ActiveInteractionContext = Context;
+    ActiveStageIndex = INDEX_NONE;
+    TryAdvanceDuringStage();
+}
+
+void USTInteractorComponent::TryAdvanceDuringStage() {
+    const USTInteractableComponent* Target = ActiveInteractionContext.InteractableComponent.Get();
+    if (!IsValid(Target)) return;
+    for (const USTInteractionAction* Action : ActiveStageActions) {
+        if (Action->bWaitForCompletion && !Action->IsCompleted()) return;
+    }
+
+    for (USTInteractionAction* Action : ActiveStageActions) {
+        Action->ReceiveStop(ActiveInteractionContext);
+        Action->ReceiveShutdown(ActiveInteractionContext);
+    }
+    ActiveStageActions.Reset();
+
+    ++ActiveStageIndex;
+    if (Target->DuringInteractionStages.IsValidIndex(ActiveStageIndex)) {
+        StartInteractionStage();
+    } else {
+        FinishInteraction();
+    }
+}
+
+void USTInteractorComponent::StartInteractionStage() {
+    const APawn* Pawn = Cast<APawn>(GetOwner());
+    const bool bLocalPlayer = Pawn && Pawn->IsPlayerControlled() && Pawn->IsLocallyControlled();
+    const auto& Templates =
+        ActiveInteractionContext.InteractableComponent->DuringInteractionStages[ActiveStageIndex].Actions;
+    for (USTInteractionAction* Template : Templates) {
+        if (!IsValid(Template)) continue;
+        if (Template->ExecutionPolicy == ESTInteractionExecutionPolicy::OwningClientOnly && !bLocalPlayer) continue;
+
+        USTInteractionAction* Action = DuplicateObject<USTInteractionAction>(Template, this);
+        ActiveStageActions.Add(Action);
+        Action->ReceiveInitialize(ActiveInteractionContext);
+        Action->ReceiveStart(ActiveInteractionContext);
+    }
+}
+
+void USTInteractorComponent::FinishInteraction() {
+    const FSTInteractionContext CompletedContext = ActiveInteractionContext;
+    ActiveInteractionContext = {};
+    ActiveStageIndex = INDEX_NONE;
+
+    AActor* TargetActor = CompletedContext.InteractableActor;
+    if (IsValid(TargetActor) && TargetActor->Implements<USTInteractableInterface>()) {
+        ISTInteractableInterface::Execute_OnInteractionCompleted(TargetActor, CompletedContext);
+    }
+}
